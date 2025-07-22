@@ -32,7 +32,7 @@ Sistema para gestionar reservas de salas de reuniones en una oficina moderna, de
 
 ## API Endpoints Principales
 
-- `POST /api/reservations` - Crear nueva reserva
+- `POST /reservar` - Crear nueva reserva
 
 ## Pipeline CI/CD
 
@@ -147,7 +147,7 @@ def test_sala_no_disponible():
 ##### **1. Curva de Aprendizaje Inicial**
 
 ```test python
-// Al principio escribía tests muy complejos
+# Al principio escribía tests muy complejos
 
 def test_should_handle_complex_reservation_scenario(self):
     # Test gigante que mezcla múltiples comportamientos
