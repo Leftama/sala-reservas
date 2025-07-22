@@ -270,11 +270,11 @@ def test_reserva_duplicada():
 
 **Toolchain Recomendado:**
 
-- **Jest**: Framework principal con watch mode
-- **Supertest**: API testing integrado
-- **Playwright**: E2E testing robusto
-- **Stryker**: Mutation testing para validar calidad de tests
-- **Pact**: Contract testing para microservicios
+- **pytest + pytest-watch**: Framework principal con watch mode
+- **Flask Test Client + pytest-flask**: API testing integrado
+- **Playwright Python o Selenium**: E2E testing robusto
+- **mutmut**: Mutation testing para validar calidad de tests
+- **pact-python**: Contract testing para microservicios
 - **SonarQube**: Análisis de calidad y coverage trends
 
 ---
