@@ -4,40 +4,35 @@
 
 Sistema para gestionar reservas de salas de reuniones en una oficina moderna, desarrollado siguiendo principios de **Agile Testing** y **Test-Driven Development (TDD)** con automatización completa en el flujo CI/CD.
 
-## 🚀 Arquitectura del Sistema
+## Arquitectura del Sistema
 
 ```sala-reservas
-├── src/
-│   ├── controllers/
-│   │   └── reservationController.js
-│   ├── models/
-│   │   └── reservation.js
-│   ├── services/
-│   │   └── reservationService.js
-│   └── routes/
-│       └── reservations.js
-├── tests/
-│   ├── unit/
-│   │   ├── models/
-│   │   ├── services/
-│   │   └── controllers/
-│   ├── integration/
-│   │   └── api/
-│   └── e2e/
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yml
-└── docker-compose.yml
+../sala-reservas/
+├── app
+│   ├── api.py
+│   ├── __init__.py
+│   ├── __pycache__
+│   └── reservas.py
+├── __init__.py
+├── __pycache__
+│   └── __init__.cpython-311.pyc
+├── README.md
+├── requirements.txt
+├── tests
+│   ├── __pycache__
+│   ├── test_api.py
+│   └── test_reservas.py
+└── venv
+    ├── bin
+    ├── include
+    ├── lib
+    ├── lib64 -> lib
+    └── pyvenv.cfg
 ```
 
 ## API Endpoints Principales
 
-- `GET /api/rooms` - Listar salas disponibles
-- `GET /api/reservations` - Obtener todas las reservas
 - `POST /api/reservations` - Crear nueva reserva
-- `PUT /api/reservations/:id` - Actualizar reserva
-- `DELETE /api/reservations/:id` - Cancelar reserva
-- `GET /api/reservations/room/:roomId` - Reservas por sala
 
 ## Pipeline CI/CD
 
@@ -190,46 +185,26 @@ def test_should_handle_complex_reservation_scenario(self):
 
 **Justificación:**
 
-```javascript
-// Test de integración que salvó el proyecto múltiples veces
-describe('Reservation API Integration', () => {
-  it('should handle complete booking flow', async () => {
-    // 1. Crear sala
-    const room = await request(app)
-      .post('/api/rooms')
-      .send({ name: 'Sala A', capacity: 10 });
-
-    // 2. Crear reserva
-    const reservation = await request(app)
-      .post('/api/reservations')
-      .send({
-        roomId: room.body.id,
-        startTime: '2024-01-15T10:00:00Z',
-        endTime: '2024-01-15T11:00:00Z',
-        userId: 'user123'
-      });
-
-    // 3. Verificar conflicto
-    const conflictResponse = await request(app)
-      .post('/api/reservations')
-      .send({
-        roomId: room.body.id,
-        startTime: '2024-01-15T10:30:00Z',
-        endTime: '2024-01-15T11:30:00Z',
-        userId: 'user456'
-      });
-
-    expect(conflictResponse.status).toBe(409);
-  });
-});
+```test python
+from app.api import app
+def test_reserva_exitosa():
+    cliente = app.test_client()
+    resp = cliente.post('/reservar', json={"sala": "B", "hora": "14:00"})
+    assert resp.status_code == 201
+def test_reserva_duplicada():
+    cliente = app.test_client()
+    cliente.post('/reservar', json={"sala": "B", "hora": "14:00"})
+    resp = cliente.post('/reservar', json={"sala": "B", "hora": "14:00"})
+    assert resp.status_code == 409
+  
 ```
 
 **Por qué aportaron más valor:**
 
-1. **Detección de problemas reales**: Encontraron issues que las pruebas unitarias no detectaron
-2. **Confianza en deployments**: Validaron que los componentes funcionan juntos
-3. **Cobertura de casos edge**: Capturaron escenarios complejos del mundo real
-4. **Feedback de UX**: Revelaron problemas de usabilidad en la API
+1. **Detección de problemas reales**: Encuentran issues que las pruebas unitarias no detectaron
+2. **Confianza en deployments**: Validan que los componentes funcionan juntos
+3. **Cobertura de casos edge**: Capturan escenarios complejos del mundo real
+4. **Feedback de UX**: Pueden revelar problemas de usabilidad en la API
 
 #### **Otras Pruebas por Orden de Valor**
 
@@ -254,30 +229,9 @@ describe('Reservation API Integration', () => {
 
 ### ¿Cómo mantendrías esta suite de pruebas con el tiempo?
 
-#### **🔧 Estrategia de Mantenimiento a Largo Plazo**
+#### **Estrategia de Mantenimiento a Largo Plazo**
 
 #### **1. Governance y Estándares**
-
-```javascript
-// Establecer patrones claros y consistentes
-// ✅ CORRECTO
-describe('ReservationService', () => {
-  describe('createReservation', () => {
-    it('should create reservation when slot is available', () => {
-      // Arrange, Act, Assert pattern
-    });
-    
-    it('should throw error when slot is occupied', () => {
-      // Error case testing
-    });
-  });
-});
-
-// ❌ EVITAR
-it('test reservation stuff', () => {
-  // Test unclear and too broad
-});
-```
 
 **Estándares a Implementar:**
 
@@ -288,87 +242,9 @@ it('test reservation stuff', () => {
 
 #### **2. Automatización de Mantenimiento**
 
-```yaml
-# .github/workflows/test-maintenance.yml
-name: Test Maintenance
-
-on:
-  schedule:
-    - cron: '0 2 * * 1' # Weekly on Monday 2 AM
-
-jobs:
-  test-health-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Detect flaky tests
-        run: npm run test:flaky-detector
-      
-      - name: Coverage trend analysis
-        run: npm run test:coverage-trend
-      
-      - name: Dead test detection
-        run: npm run test:dead-code-detector
-      
-      - name: Performance regression
-        run: npm run test:performance-baseline
-```
-
 #### **3. Arquitectura Sostenible**
 
-```javascript
-// Page Object Pattern para tests E2E
-class ReservationPage {
-  constructor(page) {
-    this.page = page;
-    this.roomSelector = '[data-testid="room-select"]';
-    this.dateInput = '[data-testid="date-input"]';
-    this.submitButton = '[data-testid="submit-reservation"]';
-  }
-
-  async makeReservation(roomId, date, timeSlot) {
-    await this.page.selectOption(this.roomSelector, roomId);
-    await this.page.fill(this.dateInput, date);
-    await this.page.selectOption('[data-testid="time-slot"]', timeSlot);
-    await this.page.click(this.submitButton);
-  }
-}
-
-// Factory Pattern para test data
-class TestDataFactory {
-  static createValidReservation(overrides = {}) {
-    return {
-      roomId: 'room-001',
-      userId: 'user-123',
-      startTime: '2024-01-15T10:00:00Z',
-      endTime: '2024-01-15T11:00:00Z',
-      ...overrides
-    };
-  }
-}
-```
-
 #### **4. Métricas y Monitoreo**
-
-```javascript
-// Dashboard de salud de tests
-const testMetrics = {
-  coverage: {
-    target: 85,
-    current: 92,
-    trend: '+2% last sprint'
-  },
-  flakiness: {
-    target: '<2%',
-    current: '1.2%',
-    flakyTests: ['reservation.e2e.spec.js:45']
-  },
-  performance: {
-    unitTests: '<100ms avg',
-    integrationTests: '<2s avg',
-    e2eTests: '<30s avg'
-  }
-};
-```
 
 #### **5. Plan de Refactoring Continuo**
 
@@ -391,19 +267,6 @@ const testMetrics = {
 - Pair testing para features complejas
 
 #### **6. Herramientas de Soporte**
-
-```json
-{
-  "scripts": {
-    "test:watch": "jest --watch",
-    "test:debug": "node --inspect-brk node_modules/.bin/jest",
-    "test:update-snapshots": "jest --updateSnapshot",
-    "test:flaky": "jest --detectOpenHandles --forceExit",
-    "test:mutation": "stryker run",
-    "test:contracts": "pact-broker can-i-deploy"
-  }
-}
-```
 
 **Toolchain Recomendado:**
 
